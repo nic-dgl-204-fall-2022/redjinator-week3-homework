@@ -7,7 +7,7 @@ interface Payable {
 }
 
 interface Fillable {
-    fun fillTank(station: ShellStation)
+    fun fillTank(station: ServiceStation)
 }
 
 interface Drivable {
@@ -19,14 +19,15 @@ interface Drivable {
 interface TimeTravelable {
     var charged: Boolean
     fun chargeFluxCapacitor()
+    fun inspectFluxCapacitor()
     fun timeTravel()
 }
 
 abstract class ServiceStation(
     val priceOfGasPerLitre: Double = 2.3
-    ) {
+) {
 
-    }
+}
 
 
 // Shell Station
@@ -46,8 +47,7 @@ class ShellStation(
 // Vehicle
 open class Vehicle(
     val cashAvailable: Double = 10.0
-    ) { }
-
+) {}
 
 
 open class Car(
@@ -58,9 +58,9 @@ open class Car(
 
     override val topSpeed: Double = 100.0
 
-    override fun fillTank(station: ShellStation) {
-        station.acceptPayment(cashAvailable)
-        station.pumpGas(cashAvailable)
+    override fun fillTank(station: ServiceStation) {
+        (station as ShellStation).acceptPayment(cashAvailable)
+        (station as ShellStation).pumpGas(cashAvailable)
     }
 
     override fun accelerate() {
@@ -73,15 +73,14 @@ open class Car(
 }
 
 
-
 class Dalorian(
 
-): Car(), TimeTravelable {
+) : Car(), TimeTravelable {
 
     override var charged: Boolean = false
 
     override fun chargeFluxCapacitor() {
-        if (charged == false) {
+        if (!charged) {
             charged = true
             println("You refill the Flux Capacitor with plutonium and set the meter to 1.21 gigawatts, a few moments later it is fully charged")
         } else {
@@ -89,12 +88,17 @@ class Dalorian(
         }
     }
 
+    override fun inspectFluxCapacitor() {
+        if (charged) println("Flux capacitor... fluxing") else println("Let's fill up Mr. Fusion!")
+    }
+
     override fun timeTravel() {
-        if (charged == false) {
+        if (!charged) {
             println("You attempt to time travel but quickly realize the Flux Capacitor is not charged")
         } else {
             accelerate()
             println("You reach 88mph and travel back in time")
+            charged = false
         }
     }
 }
